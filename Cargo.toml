@@ -1,5 +1,6 @@
 [package]
 name = "youtrack-commander"
+description = "Execute commands on Youtrack issues from the command line"
 version = "0.1.0"
 authors = ["Pavol Vidlicka <pavol.vidlicka@gmail.com>"]
 edition = "2018"
