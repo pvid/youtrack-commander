@@ -1,0 +1,23 @@
+[package]
+name = "youtrack-commander"
+version = "0.1.0"
+authors = ["Pavol Vidlicka <pavol.vidlicka@gmail.com>"]
+edition = "2018"
+repository = "https://github.com/pvid/youtrack-commander"
+license = "MIT"
+categories = ["command-line-utilities"]
+keywords = ["youtrack", "command-line"]
+
+[lib]
+name = "youtrack_commander"
+path = "src/lib.rs"
+
+[dependencies]
+anyhow = "1"
+config = "0.10"
+dirs = "3"
+lazy_static = "1.4.0"
+regex = "1"
+reqwest = { version = "0.10", features = ["blocking", "json"] }
+serde = { version = "1", features = ["derive"] }
+structopt = "0.3"
