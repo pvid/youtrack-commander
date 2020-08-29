@@ -6,7 +6,7 @@ name: release
 on:
   push:
     tags:
-      - "[0-9]+.[0-9]+.[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+"
 
 jobs:
   create-release:
@@ -18,7 +18,7 @@ jobs:
 
       - name: Get the release version from the tag
         run: |
-          echo "::set-env name=VERSION::${GITHUB_REF#refs/tags/}"
+          echo "::set-env name=VERSION::${GITHUB_REF#refs/tags/v}"
       - name: Create GitHub release
         id: release
         uses: actions/create-release@v1
