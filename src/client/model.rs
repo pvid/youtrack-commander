@@ -28,10 +28,11 @@ impl Default for CommandList {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Issue {
     #[serde(rename = "idReadable")]
     pub id_readable: String,
+    pub summary: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

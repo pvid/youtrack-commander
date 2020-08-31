@@ -1,11 +1,12 @@
 mod model;
 
 use self::model::*;
-use crate::{Command, CommandService, ParsedCommand};
+use crate::{Command, CommandService, ListedIssue, ListingService, ParsedCommand};
 use anyhow::{anyhow, Context, Result};
 use lazy_static::lazy_static;
 use regex::Regex;
-use reqwest::blocking::Client;
+use reqwest::blocking::{Client, Response};
+use serde::de::DeserializeOwned;
 
 pub struct YoutrackService<'a> {
     youtrack_url: &'a str,
@@ -31,32 +32,59 @@ impl YoutrackService<'_> {
             .bearer_auth(self.auth_token)
             .query(&[("fields", "query,caret,comment,issues(idReadable),commands(id,description,delete,error),silent,suggestions(completionStart,completionEnd,matchingStart,matchingEnd,caret,option,description),usesMarkdown")])
             .json(command_list);
-        let response = request
-            .send()
-            .context(format!("Failed make a request to {}", &request_url))?;
+        let response = request.send()?;
+        handle_response(response)
+    }
 
-        if response.status().is_success() {
-            let response_body: CommandList = response
-                .json()
-                .context("Failed to parse API response body")?;
-            Ok(response_body)
-        } else {
-            let status = response.status();
-            let error_body: Error = response.json().context(format!(
-                "Response has status code {}, but failed to parse response body",
-                status
-            ))?;
-            Err(anyhow!(
-                "Status code: {}, error_body: {:#?}",
-                status,
-                error_body
-            ))
+    fn list_issues(&self, query: String, limit: Option<u8>, offset: u8) -> Result<Vec<Issue>> {
+        let request_url = format!("{}/api/issues", self.youtrack_url);
+
+        let offset_string = offset.to_string();
+        let limit_string = limit.map(|x| x.to_string()).unwrap_or(String::from(""));
+
+        let mut headers = vec![
+            ("fields", "idReadable,summary"),
+            ("$skip", &offset_string),
+            ("query", &query),
+        ];
+
+        if limit.is_some() {
+            headers.push(("$top", &limit_string))
         }
+
+        let request = self
+            .client
+            .get(&request_url)
+            .bearer_auth(self.auth_token)
+            .query(&headers);
+
+        let response = request.send()?;
+        handle_response(response)
+    }
+}
+
+fn handle_response<D: DeserializeOwned>(response: Response) -> Result<D> {
+    if response.status().is_success() {
+        let response_body: D = response
+            .json()
+            .context("Failed to parse API response body")?;
+        Ok(response_body)
+    } else {
+        let status = response.status();
+        let error_body: Error = response.json().context(format!(
+            "Response has status code {}, but failed to parse response body",
+            status
+        ))?;
+        Err(anyhow!(
+            "Status code: {}, error_body: {:#?}",
+            status,
+            error_body
+        ))
     }
 }
 
 impl CommandService for YoutrackService<'_> {
-    fn execute_command<'a>(&self, command: Command) -> Result<Vec<ParsedCommand>> {
+    fn execute_command(&self, command: Command) -> Result<Vec<ParsedCommand>> {
         let caret = command.query.chars().count() - 1;
         let command_list = CommandList {
             query: command.query,
@@ -64,6 +92,7 @@ impl CommandService for YoutrackService<'_> {
             comment: command.comment,
             issues: vec![Issue {
                 id_readable: command.issue_id.to_string(),
+                ..Default::default()
             }],
             ..Default::default()
         };
@@ -84,6 +113,25 @@ lazy_static! {
 
 fn remove_html_tag(input: &str) -> String {
     TAG_REGEX.replace_all(input, "").into_owned()
+}
+
+impl ListingService for YoutrackService<'_> {
+    fn list_issues(
+        &self,
+        query: String,
+        limit: Option<u8>,
+        offset: u8,
+    ) -> Result<Vec<ListedIssue>> {
+        let issues = self.list_issues(query, limit, offset)?;
+        let result = issues
+            .into_iter()
+            .map(|issue| ListedIssue {
+                id: issue.id_readable,
+                summary: issue.summary.unwrap(),
+            })
+            .collect();
+        Ok(result)
+    }
 }
 
 #[cfg(test)]
