@@ -64,7 +64,6 @@ auth_token: "perm:your-auth-token"
 
 ## Coming soon
 
-- list issues (using an ad-hoc query or a saved search)
 - a console mode with suggestions (implemented using the `/commands/assist` endpoint)
 
 ## Installation
