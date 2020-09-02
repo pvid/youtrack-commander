@@ -87,3 +87,4 @@ cargo install youtrack-commander
 ## Similar projects
 
 - [youtrack-cli](https://github.com/shanehofstetter/youtrack-cli) (and [youtrack-rest-client](https://github.com/shanehofstetter/youtrack-rest-client) that it uses) written in TypeScript
+- [goutrack](https://github.com/codegoalie/goutrack) - a go project that also allows you to execute commands on issues
