@@ -1,0 +1,26 @@
+version: 2
+updates:
+- package-ecosystem: cargo
+  directory: "/"
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: anyhow
+    versions:
+    - 1.0.38
+    - 1.0.39
+  - dependency-name: reqwest
+    versions:
+    - 0.11.0
+    - 0.11.1
+    - 0.11.2
+  - dependency-name: regex
+    versions:
+    - 1.4.3
+    - 1.4.5
+  - dependency-name: serde
+    versions:
+    - 1.0.122
+    - 1.0.123
+    - 1.0.124
