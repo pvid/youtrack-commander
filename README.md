@@ -3,6 +3,9 @@
 [![Build status](https://github.com/pvid/youtrack-commander/workflows/CI/badge.svg)](https://github.com/pvid/youtrack-commander/actions?query=workflow%3ACI+branch%3Amaster)
 [![crates.io](https://img.shields.io/crates/v/youtrack-commander.svg)](https://crates.io/crates/youtrack-commander)
 
+**NOTICE** I am no longer a Youtrack user, therefore I have no motivation to continue with working on this.
+However, I can say that writing a CLI client that simply talks to an API is quite pleasant!
+
 Execute commands on Youtrack issues from the command line
 
 - [Youtrack Commander](#youtrack-commander)
