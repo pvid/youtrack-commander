@@ -18,7 +18,7 @@ jobs:
 
       - name: Get the release version from the tag
         run: |
-          echo "::set-env name=VERSION::${GITHUB_REF#refs/tags/v}"
+          echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
       - name: Create GitHub release
         id: release
         uses: actions/create-release@v1
